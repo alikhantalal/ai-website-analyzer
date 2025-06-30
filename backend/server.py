@@ -587,6 +587,7 @@ class WebsiteAnalyzer:
         issues = []
         has_faq = False
         faq_indicators = []
+        faq_locations = []
         
         # Text-based FAQ detection
         text_content = parsed_data.get('text_content', '').lower()
@@ -600,14 +601,28 @@ class WebsiteAnalyzer:
         ]
         
         for pattern in faq_patterns:
-            if re.search(pattern, text_content):
+            matches = re.finditer(pattern, text_content)
+            for match in matches:
                 has_faq = True
                 faq_indicators.append(f"Text pattern: {pattern}")
+                faq_locations.append({
+                    'type': 'Text Pattern',
+                    'pattern': pattern,
+                    'matched_text': match.group(),
+                    'position': match.start()
+                })
         
         # Heading-based FAQ detection
         all_headings = []
         for level in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
-            all_headings.extend(parsed_data.get('headings', {}).get(level, []))
+            headings = soup.find_all(level)
+            for i, heading in enumerate(headings):
+                all_headings.append({
+                    'level': level,
+                    'text': heading.get_text().strip(),
+                    'element': heading,
+                    'position': i + 1
+                })
         
         faq_heading_patterns = [
             r'faq',
@@ -617,12 +632,19 @@ class WebsiteAnalyzer:
             r'help.*support'
         ]
         
-        for heading in all_headings:
-            heading_lower = heading.lower()
+        for heading_info in all_headings:
+            heading_lower = heading_info['text'].lower()
             for pattern in faq_heading_patterns:
                 if re.search(pattern, heading_lower):
                     has_faq = True
-                    faq_indicators.append(f"Heading: {heading}")
+                    faq_indicators.append(f"Heading: {heading_info['text']}")
+                    faq_locations.append({
+                        'type': 'Heading',
+                        'level': heading_info['level'].upper(),
+                        'text': heading_info['text'],
+                        'pattern_matched': pattern,
+                        'position': heading_info['position']
+                    })
                     break
         
         # Structure-based FAQ detection (Q&A pairs)
@@ -632,18 +654,51 @@ class WebsiteAnalyzer:
         if len(question_indicators) >= 2 and len(answer_indicators) >= 2:
             has_faq = True
             faq_indicators.append(f"Q&A structure: {len(question_indicators)} questions, {len(answer_indicators)} answers")
+            
+            # Capture locations of Q&A elements
+            for i, q in enumerate(question_indicators[:3]):  # Limit to first 3 for brevity
+                parent = q.parent if q.parent else None
+                faq_locations.append({
+                    'type': 'Question Element',
+                    'text': str(q).strip()[:50] + '...' if len(str(q)) > 50 else str(q).strip(),
+                    'parent_element': parent.name if parent else 'unknown',
+                    'parent_class': parent.get('class', []) if parent else [],
+                    'position': i + 1
+                })
         
         # Check for FAQ-specific HTML structures
         faq_containers = soup.find_all(attrs={'class': re.compile(r'faq|question|accordion', re.IGNORECASE)})
         if len(faq_containers) >= 2:
             has_faq = True
             faq_indicators.append(f"FAQ containers: {len(faq_containers)} elements")
+            
+            # Capture container details
+            for i, container in enumerate(faq_containers[:3]):  # Limit to first 3
+                faq_locations.append({
+                    'type': 'FAQ Container',
+                    'element': container.name,
+                    'class': container.get('class', []),
+                    'id': container.get('id', ''),
+                    'text_preview': container.get_text()[:50] + '...' if len(container.get_text()) > 50 else container.get_text(),
+                    'position': i + 1
+                })
         
         # Schema-based FAQ detection
         faq_schema_elements = soup.find_all(attrs={'itemtype': re.compile(r'FAQPage|Question', re.IGNORECASE)})
         if faq_schema_elements:
             has_faq = True
             faq_indicators.append(f"Schema FAQ elements: {len(faq_schema_elements)}")
+            
+            # Capture schema FAQ details
+            for i, element in enumerate(faq_schema_elements):
+                faq_locations.append({
+                    'type': 'Schema FAQ',
+                    'element': element.name,
+                    'itemtype': element.get('itemtype', ''),
+                    'class': element.get('class', []),
+                    'text_preview': element.get_text()[:50] + '...' if len(element.get_text()) > 50 else element.get_text(),
+                    'position': i + 1
+                })
         
         if not has_faq:
             issues.append("No FAQ structure detected")
@@ -651,6 +706,7 @@ class WebsiteAnalyzer:
         return {
             'has_faq': has_faq,
             'faq_indicators': faq_indicators,
+            'faq_locations': faq_locations,
             'question_count': len(question_indicators),
             'answer_count': len(answer_indicators),
             'faq_containers': len(faq_containers),
