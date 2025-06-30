@@ -27,7 +27,7 @@ def get_backend_url():
 
 # Main backend URL
 BACKEND_URL = get_backend_url()
-API_BASE_URL = urljoin(BACKEND_URL, '/api/')
+API_BASE_URL = urljoin(BACKEND_URL, '/api')
 
 logger.info(f"Using backend URL: {BACKEND_URL}")
 logger.info(f"API base URL: {API_BASE_URL}")
