@@ -295,3 +295,5 @@ agent_communication:
     message: "Completed initial implementation of AI-Powered Website Analyzer with full backend analysis engine (OpenAI GPT-4o-mini integration, web scraping, scoring algorithms) and comprehensive frontend dashboard. Ready for backend testing to verify core functionality before proceeding to frontend testing."
   - agent: "testing"
     message: "Completed backend testing for the AI-Powered Website Analyzer. All core backend components are working correctly: the analysis engine, API endpoints, background processing, and AI insights generation. The only minor issue is with error handling for empty URLs, but this doesn't affect core functionality. The backend is ready for frontend integration testing."
+  - agent: "main"
+    message: "Enhanced application with Schema & FAQ analysis featuring 4 checkpoint categories (Both Schema+FAQ, Schema Only, FAQ Only, Neither) and comprehensive PDF export functionality. Added schema markup detection (JSON-LD, Microdata, RDFa), FAQ structure analysis, professional PDF report generation, and enhanced frontend UI with export capabilities. Ready for testing of new features."
