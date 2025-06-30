@@ -234,10 +234,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Core Website Analysis Engine"
-    - "API Endpoints for Analysis"
-    - "AI-Powered Insights Generation"
-    - "Background Processing with Progress Tracking"
+    - "URL Input and Validation"
+    - "Real-time Progress Indicator"
+    - "Results Dashboard with Scoring"
+    - "AI Recommendations Display"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
