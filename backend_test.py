@@ -160,7 +160,8 @@ class WebsiteAnalyzerTester:
                     "performance": result_data["performance_score"],
                     "seo": result_data["seo_score"],
                     "technical": result_data["technical_score"],
-                    "accessibility": result_data["accessibility_score"]
+                    "accessibility": result_data["accessibility_score"],
+                    "schema_faq": result_data["schema_faq_score"]
                 },
                 "ai_insights_valid": ai_insights_valid,
                 "recommendation_count": len(result_data["ai_insights"].get("recommendations", []))
