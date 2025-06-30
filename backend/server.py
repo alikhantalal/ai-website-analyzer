@@ -70,8 +70,11 @@ class AnalysisResult(BaseModel):
     seo_score: int
     technical_score: int
     accessibility_score: int
+    schema_faq_score: int
     analysis_data: Dict[str, Any]
     ai_insights: Dict[str, Any]
+    schema_faq_analysis: Dict[str, Any]
+    checkpoint_category: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
 
