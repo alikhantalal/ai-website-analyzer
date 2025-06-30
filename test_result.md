@@ -288,8 +288,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Schema and FAQ Analysis with 4 Checkpoints"
-    - "PDF Export Functionality"
     - "Enhanced Results Dashboard with Schema/FAQ Display"
     - "PDF Export Button and Functionality"
   stuck_tasks: []
