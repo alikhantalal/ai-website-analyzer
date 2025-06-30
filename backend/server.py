@@ -131,12 +131,16 @@ class WebsiteAnalyzer:
             await self.update_progress(session_id, 85, "analyzing", "Analyzing accessibility...")
             accessibility_data = self.analyze_accessibility(parsed_data)
             
-            # Step 7: Generate AI insights
+            # Step 7: Schema and FAQ analysis
+            await self.update_progress(session_id, 90, "analyzing", "Analyzing schema and FAQ structure...")
+            schema_faq_data = self.analyze_schema_and_faq(parsed_data, html_content)
+            
+            # Step 8: Generate AI insights
             await self.update_progress(session_id, 95, "generating", "Generating AI insights...")
             ai_insights = await self.generate_ai_insights(parsed_data, performance_data, seo_data, technical_data, url)
             
-            # Step 8: Calculate scores
-            scores = self.calculate_scores(performance_data, seo_data, technical_data, accessibility_data)
+            # Step 9: Calculate scores
+            scores = self.calculate_scores(performance_data, seo_data, technical_data, accessibility_data, schema_faq_data)
             
             # Compile final result
             analysis_data = {
