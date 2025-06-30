@@ -282,12 +282,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "URL Input and Validation"
-    - "Real-time Progress Indicator"
-    - "Results Dashboard with Scoring"
-    - "AI Recommendations Display"
+    - "Schema and FAQ Analysis with 4 Checkpoints"
+    - "PDF Export Functionality"
+    - "Enhanced Results Dashboard with Schema/FAQ Display"
+    - "PDF Export Button and Functionality"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
