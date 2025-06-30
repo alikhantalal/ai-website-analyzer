@@ -376,6 +376,47 @@ function App() {
               </div>
             </div>
 
+            {/* Schema & FAQ Analysis Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Schema & FAQ Analysis</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Checkpoint Category */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-2">Checkpoint Category</h4>
+                  <div className="text-lg font-semibold mb-2">
+                    {result.schema_faq_analysis?.category_label || "❌ Neither Schema nor FAQ"}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Score: {result.schema_faq_score || 0}/100
+                  </div>
+                </div>
+
+                {/* Analysis Details */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-2">Analysis Details</h4>
+                  <div className="space-y-1 text-sm">
+                    <p className="text-gray-600">
+                      <span className="font-medium">Schema Markup:</span> {result.schema_faq_analysis?.has_schema ? "✓ Found" : "✗ Not Found"}
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-medium">FAQ Structure:</span> {result.schema_faq_analysis?.has_faq ? "✓ Found" : "✗ Not Found"}
+                    </p>
+                    {result.schema_faq_analysis?.schema_details?.schema_types && result.schema_faq_analysis.schema_details.schema_types.length > 0 && (
+                      <p className="text-gray-600">
+                        <span className="font-medium">Schema Types:</span> {result.schema_faq_analysis.schema_details.schema_types.slice(0, 2).join(", ")}
+                        {result.schema_faq_analysis.schema_details.schema_types.length > 2 && "..."}
+                      </p>
+                    )}
+                    {result.schema_faq_analysis?.faq_details?.question_count > 0 && (
+                      <p className="text-gray-600">
+                        <span className="font-medium">FAQ Questions:</span> {result.schema_faq_analysis.faq_details.question_count}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* AI Insights */}
             {result.ai_insights && result.ai_insights.recommendations && (
               <div className="bg-white rounded-lg shadow-md p-6">
