@@ -29,6 +29,27 @@ function App() {
     }
   };
 
+  const downloadReport = async (sessionId) => {
+    try {
+      const response = await axios.get(`${API}/export/${sessionId}?format=pdf`, {
+        responseType: 'blob'
+      });
+      
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `website_analysis_${sessionId.slice(0, 8)}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download report:", error);
+      setError("Failed to download report. Please try again.");
+    }
+  };
+
   const validateUrl = (url) => {
     const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
     return urlPattern.test(url);
