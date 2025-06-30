@@ -287,6 +287,43 @@ class WebsiteAnalyzerTester:
             self.log_test_result("Schema & FAQ Analysis", False, str(e))
             return False
     
+    def test_ai_insights_generation(self, result_data):
+        """Test AI insights generation from analysis results"""
+        try:
+            if not result_data or "ai_insights" not in result_data:
+                self.log_test_result("AI Insights Generation", False, "No result data or AI insights available")
+                return False
+            
+            ai_insights = result_data["ai_insights"]
+            
+            # Check if recommendations exist
+            if "recommendations" not in ai_insights:
+                self.log_test_result("AI Insights Generation", False, "No recommendations in AI insights")
+                return False
+            
+            recommendations = ai_insights["recommendations"]
+            
+            # Check if there are recommendations
+            if not recommendations:
+                self.log_test_result("AI Insights Generation", False, "Empty recommendations list")
+                return False
+            
+            # Check recommendation structure
+            required_fields = ["title", "description", "priority", "impact"]
+            valid_recommendations = all(all(field in rec for field in required_fields) for rec in recommendations)
+            
+            passed = valid_recommendations
+            self.log_test_result("AI Insights Generation", passed, {
+                "recommendation_count": len(recommendations),
+                "sample_recommendation": recommendations[0] if recommendations else None,
+                "valid_structure": valid_recommendations
+            })
+            
+            return passed
+        except Exception as e:
+            self.log_test_result("AI Insights Generation", False, str(e))
+            return False
+    
     def test_pdf_export(self, session_id):
         """Test PDF export functionality"""
         try:
