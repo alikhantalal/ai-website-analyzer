@@ -757,7 +757,16 @@ Current Scores:
             alignment=1
         )
         story.append(Paragraph(f"<b>Website:</b> {analysis_result['url']}", url_style))
-        story.append(Paragraph(f"<b>Analysis Date:</b> {analysis_result['created_at'][:10]}", url_style))
+        
+        # Format the datetime object properly
+        created_at = analysis_result['created_at']
+        if isinstance(created_at, datetime):
+            created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            # If it's already a string, use it directly
+            created_at_str = str(created_at)
+            
+        story.append(Paragraph(f"<b>Analysis Date:</b> {created_at_str}", url_style))
         story.append(Spacer(1, 20))
         
         # Overall Score Section
