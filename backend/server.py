@@ -726,6 +726,159 @@ Current Scores:
                     }
                 ]
             }
+    
+    def generate_pdf_report(self, analysis_result: dict):
+        """Generate PDF report from analysis result"""
+        buffer = BytesIO()
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Title
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30,
+            textColor=colors.HexColor('#1e40af'),
+            alignment=1  # Center alignment
+        )
+        story.append(Paragraph("Website Analysis Report", title_style))
+        story.append(Spacer(1, 20))
+        
+        # Website URL and basic info
+        url_style = ParagraphStyle(
+            'URLStyle',
+            parent=styles['Normal'],
+            fontSize=14,
+            spaceAfter=20,
+            alignment=1
+        )
+        story.append(Paragraph(f"<b>Website:</b> {analysis_result['url']}", url_style))
+        story.append(Paragraph(f"<b>Analysis Date:</b> {analysis_result['created_at'][:10]}", url_style))
+        story.append(Spacer(1, 20))
+        
+        # Overall Score Section
+        score_style = ParagraphStyle(
+            'ScoreStyle',
+            parent=styles['Heading2'],
+            fontSize=18,
+            spaceAfter=15,
+            textColor=colors.HexColor('#059669')
+        )
+        story.append(Paragraph(f"Overall Score: {analysis_result['overall_score']}/100", score_style))
+        story.append(Spacer(1, 20))
+        
+        # Scores Table
+        scores_data = [
+            ['Category', 'Score', 'Status'],
+            ['Performance', f"{analysis_result['performance_score']}/100", self.get_score_status(analysis_result['performance_score'])],
+            ['SEO', f"{analysis_result['seo_score']}/100", self.get_score_status(analysis_result['seo_score'])],
+            ['Technical', f"{analysis_result['technical_score']}/100", self.get_score_status(analysis_result['technical_score'])],
+            ['Accessibility', f"{analysis_result['accessibility_score']}/100", self.get_score_status(analysis_result['accessibility_score'])],
+            ['Schema & FAQ', f"{analysis_result['schema_faq_score']}/100", self.get_score_status(analysis_result['schema_faq_score'])]
+        ]
+        
+        scores_table = Table(scores_data, colWidths=[2*inch, 1*inch, 1.5*inch])
+        scores_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e5e7eb')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(scores_table)
+        story.append(Spacer(1, 30))
+        
+        # Schema & FAQ Analysis Section
+        story.append(Paragraph("Schema & FAQ Analysis", styles['Heading2']))
+        schema_faq = analysis_result.get('schema_faq_analysis', {})
+        story.append(Paragraph(f"<b>Category:</b> {schema_faq.get('category_label', 'N/A')}", styles['Normal']))
+        story.append(Paragraph(f"<b>Has Schema:</b> {'Yes' if schema_faq.get('has_schema') else 'No'}", styles['Normal']))
+        story.append(Paragraph(f"<b>Has FAQ:</b> {'Yes' if schema_faq.get('has_faq') else 'No'}", styles['Normal']))
+        story.append(Spacer(1, 15))
+        
+        # Schema Details
+        if schema_faq.get('has_schema'):
+            story.append(Paragraph("Schema Details:", styles['Heading3']))
+            schema_details = schema_faq.get('schema_details', {})
+            story.append(Paragraph(f"• JSON-LD Scripts: {schema_details.get('json_ld_count', 0)}", styles['Normal']))
+            story.append(Paragraph(f"• Microdata Elements: {schema_details.get('microdata_count', 0)}", styles['Normal']))
+            story.append(Paragraph(f"• RDFa Elements: {schema_details.get('rdfa_count', 0)}", styles['Normal']))
+            
+            if schema_details.get('schema_types'):
+                story.append(Paragraph("Schema Types Found:", styles['Normal']))
+                for schema_type in schema_details['schema_types'][:5]:  # Limit to first 5
+                    story.append(Paragraph(f"  - {schema_type}", styles['Normal']))
+            story.append(Spacer(1, 15))
+        
+        # FAQ Details
+        if schema_faq.get('has_faq'):
+            story.append(Paragraph("FAQ Details:", styles['Heading3']))
+            faq_details = schema_faq.get('faq_details', {})
+            story.append(Paragraph(f"• Questions Found: {faq_details.get('question_count', 0)}", styles['Normal']))
+            story.append(Paragraph(f"• Answers Found: {faq_details.get('answer_count', 0)}", styles['Normal']))
+            story.append(Paragraph(f"• FAQ Containers: {faq_details.get('faq_containers', 0)}", styles['Normal']))
+            story.append(Spacer(1, 15))
+        
+        # AI Recommendations Section
+        story.append(PageBreak())
+        story.append(Paragraph("AI-Powered Recommendations", styles['Heading2']))
+        
+        ai_insights = analysis_result.get('ai_insights', {})
+        recommendations = ai_insights.get('recommendations', [])
+        
+        for i, rec in enumerate(recommendations[:5], 1):  # Limit to first 5 recommendations
+            story.append(Paragraph(f"{i}. {rec.get('title', 'N/A')}", styles['Heading3']))
+            story.append(Paragraph(f"<b>Priority:</b> {rec.get('priority', 'N/A')}", styles['Normal']))
+            story.append(Paragraph(f"<b>Description:</b> {rec.get('description', 'N/A')}", styles['Normal']))
+            if rec.get('impact'):
+                story.append(Paragraph(f"<b>Expected Impact:</b> {rec['impact']}", styles['Normal']))
+            story.append(Spacer(1, 15))
+        
+        # Performance Details Section
+        story.append(PageBreak())
+        story.append(Paragraph("Detailed Analysis", styles['Heading2']))
+        
+        # Performance
+        perf_data = analysis_result.get('analysis_data', {}).get('performance', {})
+        story.append(Paragraph("Performance Analysis:", styles['Heading3']))
+        story.append(Paragraph(f"• Response Time: {perf_data.get('response_time', 0):.2f} seconds", styles['Normal']))
+        story.append(Paragraph(f"• Page Size: {perf_data.get('content_size', 0) / 1024:.1f} KB", styles['Normal']))
+        story.append(Paragraph(f"• Images: {perf_data.get('images_count', 0)}", styles['Normal']))
+        story.append(Paragraph(f"• Images without Alt: {perf_data.get('images_without_alt', 0)}", styles['Normal']))
+        story.append(Spacer(1, 15))
+        
+        # SEO
+        seo_data = analysis_result.get('analysis_data', {}).get('seo', {})
+        story.append(Paragraph("SEO Analysis:", styles['Heading3']))
+        story.append(Paragraph(f"• Title Length: {seo_data.get('title_length', 0)} characters", styles['Normal']))
+        story.append(Paragraph(f"• Meta Description Length: {seo_data.get('meta_description_length', 0)} characters", styles['Normal']))
+        story.append(Paragraph(f"• Word Count: {seo_data.get('word_count', 0)}", styles['Normal']))
+        story.append(Paragraph(f"• H1 Tags: {seo_data.get('h1_count', 0)}", styles['Normal']))
+        story.append(Paragraph(f"• Internal Links: {seo_data.get('internal_links', 0)}", styles['Normal']))
+        story.append(Paragraph(f"• External Links: {seo_data.get('external_links', 0)}", styles['Normal']))
+        
+        # Build PDF
+        doc.build(story)
+        buffer.seek(0)
+        return buffer
+    
+    def get_score_status(self, score):
+        """Get status label for score"""
+        if score >= 80:
+            return "Excellent"
+        elif score >= 60:
+            return "Good"
+        elif score >= 40:
+            return "Fair"
+        else:
+            return "Poor"
 
 # Initialize analyzer
 analyzer = WebsiteAnalyzer()
