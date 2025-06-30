@@ -482,23 +482,36 @@ class WebsiteAnalyzer:
         issues = []
         schema_types = []
         has_schema = False
+        schema_locations = []
         
         # JSON-LD Detection
         json_ld_scripts = soup.find_all('script', type='application/ld+json')
         json_ld_schemas = []
         
-        for script in json_ld_scripts:
+        for i, script in enumerate(json_ld_scripts):
             try:
                 schema_data = json.loads(script.string)
+                location_info = {
+                    'type': 'JSON-LD',
+                    'element': 'script',
+                    'position': i + 1,
+                    'parent': script.parent.name if script.parent else 'unknown',
+                    'content_preview': script.string[:100] + '...' if len(script.string) > 100 else script.string
+                }
+                
                 if isinstance(schema_data, dict) and '@type' in schema_data:
                     json_ld_schemas.append(schema_data['@type'])
                     schema_types.append(f"JSON-LD: {schema_data['@type']}")
+                    location_info['schema_type'] = schema_data['@type']
+                    schema_locations.append(location_info)
                     has_schema = True
                 elif isinstance(schema_data, list):
                     for item in schema_data:
                         if isinstance(item, dict) and '@type' in item:
                             json_ld_schemas.append(item['@type'])
                             schema_types.append(f"JSON-LD: {item['@type']}")
+                            location_info['schema_type'] = item['@type']
+                            schema_locations.append(location_info.copy())
                             has_schema = True
             except (json.JSONDecodeError, KeyError):
                 continue
@@ -507,22 +520,44 @@ class WebsiteAnalyzer:
         microdata_elements = soup.find_all(attrs={'itemscope': True})
         microdata_types = []
         
-        for element in microdata_elements:
+        for i, element in enumerate(microdata_elements):
             itemtype = element.get('itemtype')
             if itemtype:
                 microdata_types.append(itemtype)
                 schema_types.append(f"Microdata: {itemtype}")
+                
+                location_info = {
+                    'type': 'Microdata',
+                    'element': element.name,
+                    'position': i + 1,
+                    'itemtype': itemtype,
+                    'class': element.get('class', []),
+                    'id': element.get('id', ''),
+                    'text_preview': element.get_text()[:50] + '...' if len(element.get_text()) > 50 else element.get_text()
+                }
+                schema_locations.append(location_info)
                 has_schema = True
         
         # RDFa Detection
         rdfa_elements = soup.find_all(attrs={'typeof': True})
         rdfa_types = []
         
-        for element in rdfa_elements:
+        for i, element in enumerate(rdfa_elements):
             typeof = element.get('typeof')
             if typeof:
                 rdfa_types.append(typeof)
                 schema_types.append(f"RDFa: {typeof}")
+                
+                location_info = {
+                    'type': 'RDFa',
+                    'element': element.name,
+                    'position': i + 1,
+                    'typeof': typeof,
+                    'property': element.get('property', ''),
+                    'class': element.get('class', []),
+                    'text_preview': element.get_text()[:50] + '...' if len(element.get_text()) > 50 else element.get_text()
+                }
+                schema_locations.append(location_info)
                 has_schema = True
         
         # Check for common schema types
@@ -543,6 +578,7 @@ class WebsiteAnalyzer:
             'json_ld_schemas': json_ld_schemas,
             'microdata_types': microdata_types,
             'rdfa_types': rdfa_types,
+            'schema_locations': schema_locations,
             'issues': issues
         }
     
