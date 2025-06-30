@@ -148,6 +148,7 @@ class WebsiteAnalyzer:
                 "seo": seo_data,
                 "technical": technical_data,
                 "accessibility": accessibility_data,
+                "schema_faq": schema_faq_data,
                 "parsed_content": parsed_data
             }
             
@@ -159,8 +160,11 @@ class WebsiteAnalyzer:
                 seo_score=scores["seo"],
                 technical_score=scores["technical"],
                 accessibility_score=scores["accessibility"],
+                schema_faq_score=scores["schema_faq"],
                 analysis_data=analysis_data,
                 ai_insights=ai_insights,
+                schema_faq_analysis=schema_faq_data,
+                checkpoint_category=schema_faq_data["checkpoint_category"],
                 completed_at=datetime.utcnow()
             )
             
