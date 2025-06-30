@@ -531,10 +531,29 @@ function App() {
                       No Schema or FAQ Structure Detected
                     </h4>
                     <div className="text-sm text-gray-600">
-                      <p className="mb-2">This website doesn't appear to have structured data markup or FAQ sections.</p>
-                      <p className="text-xs">
-                        <strong>Recommendations:</strong> Consider adding JSON-LD schema markup and organizing common questions into an FAQ section to improve SEO and user experience.
-                      </p>
+                      <p className="mb-3">This website doesn't appear to have structured data markup or FAQ sections.</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-3 bg-blue-50 rounded">
+                          <h5 className="font-medium text-blue-800 mb-2">Add Schema Markup:</h5>
+                          <ul className="text-xs text-blue-700 list-disc list-inside space-y-1">
+                            <li>Add JSON-LD scripts to head section</li>
+                            <li>Include Organization/LocalBusiness schema</li>
+                            <li>Add Product schema if applicable</li>
+                            <li>Use Google's Structured Data Markup Helper</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="p-3 bg-yellow-50 rounded">
+                          <h5 className="font-medium text-yellow-800 mb-2">Create FAQ Section:</h5>
+                          <ul className="text-xs text-yellow-700 list-disc list-inside space-y-1">
+                            <li>Add common customer questions</li>
+                            <li>Use clear Q: and A: formatting</li>
+                            <li>Include FAQ schema markup</li>
+                            <li>Make it searchable and easy to navigate</li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -547,10 +566,18 @@ function App() {
                       Missing FAQ Structure
                     </h4>
                     <div className="text-sm text-gray-600">
-                      <p className="mb-2">Great schema markup found, but no FAQ section detected.</p>
-                      <p className="text-xs">
-                        <strong>Recommendation:</strong> Add an FAQ section with proper schema markup to improve user experience and search visibility.
-                      </p>
+                      <p className="mb-3">Great schema markup found! Now add an FAQ section to improve user experience.</p>
+                      
+                      <div className="p-3 bg-yellow-50 rounded">
+                        <h5 className="font-medium text-yellow-800 mb-2">🎯 Next Steps:</h5>
+                        <ul className="text-xs text-yellow-700 list-disc list-inside space-y-1">
+                          <li>Create an FAQ page or section</li>
+                          <li>Add FAQPage schema markup</li>
+                          <li>Include Question and Answer schema</li>
+                          <li>Link FAQ from main navigation</li>
+                          <li>Use accordion-style layout for better UX</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -563,10 +590,18 @@ function App() {
                       Missing Schema Markup
                     </h4>
                     <div className="text-sm text-gray-600">
-                      <p className="mb-2">FAQ structure found, but no structured data markup detected.</p>
-                      <p className="text-xs">
-                        <strong>Recommendation:</strong> Add JSON-LD schema markup to help search engines better understand your content structure.
-                      </p>
+                      <p className="mb-3">FAQ structure found! Now add schema markup to help search engines understand your content.</p>
+                      
+                      <div className="p-3 bg-blue-50 rounded">
+                        <h5 className="font-medium text-blue-800 mb-2">🎯 Next Steps:</h5>
+                        <ul className="text-xs text-blue-700 list-disc list-inside space-y-1">
+                          <li>Add FAQPage schema to your FAQ section</li>
+                          <li>Include Question and Answer schema for each Q&A</li>
+                          <li>Add Organization schema for business info</li>
+                          <li>Use JSON-LD format (Google preferred)</li>
+                          <li>Test with Google's Rich Results Test tool</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
