@@ -250,6 +250,30 @@ frontend:
         agent: "main"
         comment: "Designed modern, responsive interface using Tailwind CSS with beautiful animations, hover effects, and professional styling including circular progress indicators and card layouts"
 
+  - task: "Enhanced Results Dashboard with Schema/FAQ Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced results dashboard to display Schema & FAQ analysis section with checkpoint categories, added 5th score card for Schema & FAQ score, and integrated new analysis data into the UI."
+
+  - task: "PDF Export Button and Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Export PDF button with download functionality, implemented downloadReport function for PDF blob handling, and enhanced recent analyses display to show schema/FAQ categories."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
