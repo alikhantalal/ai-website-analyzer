@@ -455,6 +455,17 @@ function App() {
                           </div>
                         </div>
                       )}
+
+                      {/* Schema Recommendations */}
+                      <div className="mt-3 p-2 bg-blue-50 rounded text-xs">
+                        <span className="font-medium text-blue-800">💡 Schema Best Practices:</span>
+                        <ul className="mt-1 text-blue-700 list-disc list-inside">
+                          <li>JSON-LD is Google's preferred format</li>
+                          <li>Add Organization schema for business info</li>
+                          <li>Use FAQPage schema for FAQ sections</li>
+                          <li>Validate with Google's Rich Results Test</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
