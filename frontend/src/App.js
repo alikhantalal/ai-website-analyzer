@@ -456,6 +456,38 @@ function App() {
                         </div>
                       )}
 
+                      {/* Schema Location Details */}
+                      {result.schema_faq_analysis.schema_details.schema_locations && result.schema_faq_analysis.schema_details.schema_locations.length > 0 && (
+                        <div className="mt-3">
+                          <span className="text-gray-600 font-medium">Found Locations:</span>
+                          <div className="mt-1 space-y-1 max-h-32 overflow-y-auto">
+                            {result.schema_faq_analysis.schema_details.schema_locations.slice(0, 3).map((location, index) => (
+                              <div key={index} className="text-xs bg-gray-50 border rounded p-2">
+                                <div className="font-medium text-gray-700">
+                                  {location.type} #{location.position}
+                                </div>
+                                <div className="text-gray-600 mt-1">
+                                  Element: &lt;{location.element}&gt;
+                                  {location.schema_type && <span className="ml-2 text-blue-600">Type: {location.schema_type}</span>}
+                                  {location.itemtype && <span className="ml-2 text-blue-600">ItemType: {location.itemtype.split('/').pop()}</span>}
+                                  {location.typeof && <span className="ml-2 text-blue-600">TypeOf: {location.typeof}</span>}
+                                </div>
+                                {(location.content_preview || location.text_preview) && (
+                                  <div className="text-gray-500 mt-1 italic">
+                                    "{(location.content_preview || location.text_preview).substring(0, 60)}..."
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                            {result.schema_faq_analysis.schema_details.schema_locations.length > 3 && (
+                              <div className="text-xs text-gray-500 text-center py-1">
+                                +{result.schema_faq_analysis.schema_details.schema_locations.length - 3} more locations...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Schema Recommendations */}
                       <div className="mt-3 p-2 bg-blue-50 rounded text-xs">
                         <span className="font-medium text-blue-800">💡 Schema Best Practices:</span>
