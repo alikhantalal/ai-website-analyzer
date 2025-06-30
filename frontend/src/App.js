@@ -541,6 +541,40 @@ function App() {
                         </div>
                       )}
 
+                      {/* FAQ Location Details */}
+                      {result.schema_faq_analysis.faq_details.faq_locations && result.schema_faq_analysis.faq_details.faq_locations.length > 0 && (
+                        <div className="mt-3">
+                          <span className="text-gray-600 font-medium">Found Locations:</span>
+                          <div className="mt-1 space-y-1 max-h-32 overflow-y-auto">
+                            {result.schema_faq_analysis.faq_details.faq_locations.slice(0, 3).map((location, index) => (
+                              <div key={index} className="text-xs bg-gray-50 border rounded p-2">
+                                <div className="font-medium text-gray-700">
+                                  {location.type} #{location.position}
+                                </div>
+                                <div className="text-gray-600 mt-1">
+                                  {location.element && <span>Element: &lt;{location.element}&gt;</span>}
+                                  {location.level && <span>Level: {location.level}</span>}
+                                  {location.parent_element && <span className="ml-2">Parent: &lt;{location.parent_element}&gt;</span>}
+                                  {location.class && location.class.length > 0 && (
+                                    <span className="ml-2 text-purple-600">Class: {location.class.join(', ')}</span>
+                                  )}
+                                </div>
+                                {(location.text || location.text_preview || location.matched_text) && (
+                                  <div className="text-gray-500 mt-1 italic">
+                                    "{(location.text || location.text_preview || location.matched_text || '').substring(0, 60)}..."
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                            {result.schema_faq_analysis.faq_details.faq_locations.length > 3 && (
+                              <div className="text-xs text-gray-500 text-center py-1">
+                                +{result.schema_faq_analysis.faq_details.faq_locations.length - 3} more locations...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {/* FAQ Recommendations */}
                       <div className="mt-3 p-2 bg-yellow-50 rounded text-xs">
                         <span className="font-medium text-yellow-800">💡 FAQ Enhancement Tips:</span>
