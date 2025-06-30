@@ -165,6 +165,30 @@ backend:
         agent: "testing"
         comment: "Successfully tested background processing and progress tracking. The system correctly runs analysis in the background, updates progress from 0-100%, and allows polling via session ID. Progress updates work as expected with proper status messages at each stage."
 
+  - task: "Schema and FAQ Analysis with 4 Checkpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented comprehensive schema markup detection (JSON-LD, Microdata, RDFa) and FAQ structure analysis with 4 checkpoint categories: Both Schema+FAQ, Schema Only, FAQ Only, Neither. Added scoring system and integrated into overall analysis."
+
+  - task: "PDF Export Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented comprehensive PDF report generation using ReportLab with professional formatting, scores table, detailed analysis sections, AI recommendations, and schema/FAQ analysis results. Added /api/export endpoint."
+
 frontend:
   - task: "URL Input and Validation"
     implemented: true
