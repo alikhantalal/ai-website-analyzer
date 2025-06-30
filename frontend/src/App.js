@@ -512,6 +512,11 @@ function App() {
                     <p className="text-sm text-gray-600">
                       {new Date(analysis.created_at).toLocaleDateString()} - Score: {analysis.overall_score}/100
                     </p>
+                    {analysis.schema_faq_analysis?.category_label && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {analysis.schema_faq_analysis.category_label}
+                      </p>
+                    )}
                   </div>
                   <div className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBgColor(analysis.overall_score)} text-white`}>
                     {analysis.overall_score}
