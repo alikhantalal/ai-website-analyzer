@@ -493,7 +493,7 @@ function App() {
                       
                       {result.schema_faq_analysis.faq_details.faq_indicators && result.schema_faq_analysis.faq_details.faq_indicators.length > 0 && (
                         <div className="mt-3">
-                          <span className="text-gray-600 font-medium">FAQ Indicators Found:</span>
+                          <span className="text-gray-600 font-medium">FAQ Detection Methods:</span>
                           <div className="mt-1 space-y-1">
                             {result.schema_faq_analysis.faq_details.faq_indicators.slice(0, 3).map((indicator, index) => (
                               <div key={index} className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
@@ -502,12 +502,23 @@ function App() {
                             ))}
                             {result.schema_faq_analysis.faq_details.faq_indicators.length > 3 && (
                               <div className="text-xs text-gray-500">
-                                +{result.schema_faq_analysis.faq_details.faq_indicators.length - 3} more indicators...
+                                +{result.schema_faq_analysis.faq_details.faq_indicators.length - 3} more methods...
                               </div>
                             )}
                           </div>
                         </div>
                       )}
+
+                      {/* FAQ Recommendations */}
+                      <div className="mt-3 p-2 bg-yellow-50 rounded text-xs">
+                        <span className="font-medium text-yellow-800">💡 FAQ Enhancement Tips:</span>
+                        <ul className="mt-1 text-yellow-700 list-disc list-inside">
+                          <li>Add FAQPage schema markup to your questions</li>
+                          <li>Use clear Q: and A: formatting</li>
+                          <li>Group related questions together</li>
+                          <li>Make FAQ easily navigable with anchors</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
