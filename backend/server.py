@@ -941,6 +941,35 @@ async def get_recent_analyses():
     
     return analyses
 
+@api_router.get("/export/{session_id}")
+async def export_analysis(session_id: str, format: str = "pdf"):
+    """Export analysis result as PDF"""
+    result = await db.analyses.find_one({"session_id": session_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="Analysis result not found")
+    
+    # Remove MongoDB ObjectId for processing
+    if '_id' in result:
+        del result['_id']
+    
+    if format.lower() == "pdf":
+        try:
+            pdf_buffer = analyzer.generate_pdf_report(result)
+            
+            # Return PDF as streaming response
+            return StreamingResponse(
+                BytesIO(pdf_buffer.getvalue()),
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename=website_analysis_{session_id[:8]}.pdf"
+                }
+            )
+        except Exception as e:
+            logger.error(f"PDF generation failed: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+    else:
+        raise HTTPException(status_code=400, detail="Only PDF format is currently supported")
+
 # Legacy routes for compatibility
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
