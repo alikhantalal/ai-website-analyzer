@@ -621,19 +621,21 @@ class WebsiteAnalyzer:
             'issues': issues
         }
     
-    def calculate_scores(self, performance_data: dict, seo_data: dict, technical_data: dict, accessibility_data: dict):
+    def calculate_scores(self, performance_data: dict, seo_data: dict, technical_data: dict, accessibility_data: dict, schema_faq_data: dict):
         """Calculate overall and individual scores"""
         performance_score = performance_data['score']
         seo_score = seo_data['score']
         technical_score = technical_data['score']
         accessibility_score = accessibility_data['score']
+        schema_faq_score = schema_faq_data['score']
         
-        # Weighted overall score
+        # Weighted overall score (adjusted for new schema/FAQ component)
         overall_score = int(
-            (performance_score * 0.3) +
-            (seo_score * 0.4) +
-            (technical_score * 0.2) +
-            (accessibility_score * 0.1)
+            (performance_score * 0.25) +
+            (seo_score * 0.35) +
+            (technical_score * 0.15) +
+            (accessibility_score * 0.10) +
+            (schema_faq_score * 0.15)
         )
         
         return {
@@ -641,7 +643,8 @@ class WebsiteAnalyzer:
             'performance': performance_score,
             'seo': seo_score,
             'technical': technical_score,
-            'accessibility': accessibility_score
+            'accessibility': accessibility_score,
+            'schema_faq': schema_faq_score
         }
     
     async def generate_ai_insights(self, parsed_data: dict, performance_data: dict, seo_data: dict, technical_data: dict, url: str):
