@@ -378,12 +378,21 @@ class WebsiteAnalyzerTester:
                 if result_data:
                     # Test AI insights generation
                     self.test_ai_insights_generation(result_data)
+                    
+                    # Test Schema & FAQ analysis
+                    self.test_schema_faq_analysis(result_data)
+                    
+                    # Test PDF export
+                    self.test_pdf_export(session_id)
         
         # Test analyses endpoint
         self.test_analyses_endpoint()
         
         # Test error handling
         self.test_error_handling()
+        
+        # Test PDF export error handling
+        self.test_pdf_export_error_handling()
         
         # Print summary
         logger.info("\n===== TEST SUMMARY =====")
