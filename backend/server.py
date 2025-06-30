@@ -902,7 +902,7 @@ async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundT
     """Start website analysis"""
     try:
         # Validate URL
-        if not request.url:
+        if not request.url or request.url.strip() == "":
             raise HTTPException(status_code=400, detail="URL is required")
         
         # Start analysis in background
