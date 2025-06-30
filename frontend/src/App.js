@@ -282,7 +282,7 @@ function App() {
             </div>
 
             {/* Detailed Scores */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="bg-white rounded-lg shadow-md p-6 text-center">
                 <CircularProgress score={result.performance_score} label="Performance" />
                 <div className="mt-4 space-y-1">
@@ -327,6 +327,18 @@ function App() {
                   </p>
                   <p className="text-sm text-gray-600">
                     Images: {result.analysis_data.performance.images_count}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6 text-center">
+                <CircularProgress score={result.schema_faq_score} label="Schema & FAQ" />
+                <div className="mt-4 space-y-1">
+                  <p className="text-sm text-gray-600">
+                    Schema: {result.schema_faq_analysis.has_schema ? "✓" : "✗"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    FAQ: {result.schema_faq_analysis.has_faq ? "✓" : "✗"}
                   </p>
                 </div>
               </div>
