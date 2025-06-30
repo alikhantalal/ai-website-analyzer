@@ -391,9 +391,9 @@ function App() {
                   </div>
                 </div>
 
-                {/* Analysis Details */}
+                {/* Quick Overview */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">Analysis Details</h4>
+                  <h4 className="font-medium text-gray-900 mb-2">Quick Overview</h4>
                   <div className="space-y-1 text-sm">
                     <p className="text-gray-600">
                       <span className="font-medium">Schema Markup:</span> {result.schema_faq_analysis?.has_schema ? "✓ Found" : "✗ Not Found"}
@@ -403,8 +403,7 @@ function App() {
                     </p>
                     {result.schema_faq_analysis?.schema_details?.schema_types && result.schema_faq_analysis.schema_details.schema_types.length > 0 && (
                       <p className="text-gray-600">
-                        <span className="font-medium">Schema Types:</span> {result.schema_faq_analysis.schema_details.schema_types.slice(0, 2).join(", ")}
-                        {result.schema_faq_analysis.schema_details.schema_types.length > 2 && "..."}
+                        <span className="font-medium">Schema Types:</span> {result.schema_faq_analysis.schema_details.schema_types.length}
                       </p>
                     )}
                     {result.schema_faq_analysis?.faq_details?.question_count > 0 && (
@@ -414,6 +413,141 @@ function App() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Detailed Analysis */}
+              <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Schema Details */}
+                {result.schema_faq_analysis?.has_schema && (
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                      Schema Markup Found
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">JSON-LD Scripts:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.schema_details.json_ld_count || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Microdata Elements:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.schema_details.microdata_count || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">RDFa Elements:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.schema_details.rdfa_count || 0}</span>
+                      </div>
+                      
+                      {result.schema_faq_analysis.schema_details.schema_types && result.schema_faq_analysis.schema_details.schema_types.length > 0 && (
+                        <div className="mt-3">
+                          <span className="text-gray-600 font-medium">Schema Types Found:</span>
+                          <div className="mt-1 space-y-1">
+                            {result.schema_faq_analysis.schema_details.schema_types.slice(0, 5).map((type, index) => (
+                              <div key={index} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                {type}
+                              </div>
+                            ))}
+                            {result.schema_faq_analysis.schema_details.schema_types.length > 5 && (
+                              <div className="text-xs text-gray-500">
+                                +{result.schema_faq_analysis.schema_details.schema_types.length - 5} more types...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* FAQ Details */}
+                {result.schema_faq_analysis?.has_faq && (
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                      FAQ Structure Found
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Questions Detected:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.faq_details.question_count || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Answers Detected:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.faq_details.answer_count || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">FAQ Containers:</span>
+                        <span className="font-medium">{result.schema_faq_analysis.faq_details.faq_containers || 0}</span>
+                      </div>
+                      
+                      {result.schema_faq_analysis.faq_details.faq_indicators && result.schema_faq_analysis.faq_details.faq_indicators.length > 0 && (
+                        <div className="mt-3">
+                          <span className="text-gray-600 font-medium">FAQ Indicators Found:</span>
+                          <div className="mt-1 space-y-1">
+                            {result.schema_faq_analysis.faq_details.faq_indicators.slice(0, 3).map((indicator, index) => (
+                              <div key={index} className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                {indicator}
+                              </div>
+                            ))}
+                            {result.schema_faq_analysis.faq_details.faq_indicators.length > 3 && (
+                              <div className="text-xs text-gray-500">
+                                +{result.schema_faq_analysis.faq_details.faq_indicators.length - 3} more indicators...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* When no schema or FAQ found */}
+                {!result.schema_faq_analysis?.has_schema && !result.schema_faq_analysis?.has_faq && (
+                  <div className="lg:col-span-2 border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                      No Schema or FAQ Structure Detected
+                    </h4>
+                    <div className="text-sm text-gray-600">
+                      <p className="mb-2">This website doesn't appear to have structured data markup or FAQ sections.</p>
+                      <p className="text-xs">
+                        <strong>Recommendations:</strong> Consider adding JSON-LD schema markup and organizing common questions into an FAQ section to improve SEO and user experience.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Only schema, no FAQ */}
+                {result.schema_faq_analysis?.has_schema && !result.schema_faq_analysis?.has_faq && (
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                      Missing FAQ Structure
+                    </h4>
+                    <div className="text-sm text-gray-600">
+                      <p className="mb-2">Great schema markup found, but no FAQ section detected.</p>
+                      <p className="text-xs">
+                        <strong>Recommendation:</strong> Add an FAQ section with proper schema markup to improve user experience and search visibility.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Only FAQ, no schema */}
+                {!result.schema_faq_analysis?.has_schema && result.schema_faq_analysis?.has_faq && (
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                      Missing Schema Markup
+                    </h4>
+                    <div className="text-sm text-gray-600">
+                      <p className="mb-2">FAQ structure found, but no structured data markup detected.</p>
+                      <p className="text-xs">
+                        <strong>Recommendation:</strong> Add JSON-LD schema markup to help search engines better understand your content structure.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
