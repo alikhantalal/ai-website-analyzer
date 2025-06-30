@@ -900,11 +900,11 @@ async def root():
 @api_router.post("/analyze", response_model=dict)
 async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundTasks):
     """Start website analysis"""
+    # Validate URL
+    if not request.url or request.url.strip() == "":
+        raise HTTPException(status_code=400, detail="URL is required")
+    
     try:
-        # Validate URL
-        if not request.url or request.url.strip() == "":
-            raise HTTPException(status_code=400, detail="URL is required")
-        
         # Start analysis in background
         background_tasks.add_task(analyzer.analyze_website, request.url, request.session_id)
         
