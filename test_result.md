@@ -167,15 +167,18 @@ backend:
 
   - task: "Schema and FAQ Analysis with 4 Checkpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented comprehensive schema markup detection (JSON-LD, Microdata, RDFa) and FAQ structure analysis with 4 checkpoint categories: Both Schema+FAQ, Schema Only, FAQ Only, Neither. Added scoring system and integrated into overall analysis."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested the Schema & FAQ Analysis feature. The system correctly detects schema markup and FAQ structures, assigns the appropriate checkpoint category, and calculates the schema_faq_score. Tested with example.com (neither schema nor FAQ) and github.com (FAQ only). The checkpoint categories are correctly assigned and the schema_faq_analysis field is properly included in the analysis results."
 
   - task: "PDF Export Functionality"
     implemented: true
