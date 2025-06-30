@@ -138,7 +138,8 @@ class WebsiteAnalyzerTester:
             required_fields = [
                 "session_id", "url", "overall_score", "performance_score", 
                 "seo_score", "technical_score", "accessibility_score", 
-                "analysis_data", "ai_insights"
+                "schema_faq_score", "analysis_data", "ai_insights", 
+                "schema_faq_analysis", "checkpoint_category"
             ]
             
             missing_fields = [field for field in required_fields if field not in result_data]
