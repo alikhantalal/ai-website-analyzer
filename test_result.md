@@ -182,15 +182,18 @@ backend:
 
   - task: "PDF Export Functionality"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented comprehensive PDF report generation using ReportLab with professional formatting, scores table, detailed analysis sections, AI recommendations, and schema/FAQ analysis results. Added /api/export endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested the PDF Export functionality. The /api/export/{session_id}?format=pdf endpoint correctly generates and returns a PDF file with the analysis data. The PDF includes all required sections: overall score, category scores, schema & FAQ analysis, AI recommendations, and detailed analysis. Fixed an issue with datetime formatting in the PDF generation process."
 
 frontend:
   - task: "URL Input and Validation"
