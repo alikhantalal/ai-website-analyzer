@@ -223,41 +223,138 @@ class WebsiteAnalyzerTester:
             self.log_test_result("Error Handling", False, str(e))
             return False
     
-    def test_ai_insights_generation(self, result_data):
-        """Test AI insights generation from analysis results"""
+    def test_schema_faq_analysis(self, result_data):
+        """Test schema and FAQ analysis from analysis results"""
         try:
-            if not result_data or "ai_insights" not in result_data:
-                self.log_test_result("AI Insights Generation", False, "No result data or AI insights available")
+            if not result_data or "schema_faq_analysis" not in result_data:
+                self.log_test_result("Schema & FAQ Analysis", False, "No result data or schema_faq_analysis available")
                 return False
             
-            ai_insights = result_data["ai_insights"]
+            schema_faq_analysis = result_data["schema_faq_analysis"]
             
-            # Check if recommendations exist
-            if "recommendations" not in ai_insights:
-                self.log_test_result("AI Insights Generation", False, "No recommendations in AI insights")
+            # Check for required fields in schema_faq_analysis
+            required_fields = ["score", "has_schema", "has_faq", "checkpoint_category", "category_label"]
+            missing_fields = [field for field in required_fields if field not in schema_faq_analysis]
+            
+            if missing_fields:
+                self.log_test_result("Schema & FAQ Analysis", False, f"Missing fields: {missing_fields}")
                 return False
             
-            recommendations = ai_insights["recommendations"]
+            # Check checkpoint category assignment
+            valid_categories = ["both_schema_faq", "schema_only", "faq_only", "neither"]
+            category_valid = schema_faq_analysis["checkpoint_category"] in valid_categories
             
-            # Check if there are recommendations
-            if not recommendations:
-                self.log_test_result("AI Insights Generation", False, "Empty recommendations list")
-                return False
+            # Check consistency between has_schema/has_faq flags and checkpoint_category
+            category_consistent = False
+            if schema_faq_analysis["checkpoint_category"] == "both_schema_faq":
+                category_consistent = schema_faq_analysis["has_schema"] and schema_faq_analysis["has_faq"]
+            elif schema_faq_analysis["checkpoint_category"] == "schema_only":
+                category_consistent = schema_faq_analysis["has_schema"] and not schema_faq_analysis["has_faq"]
+            elif schema_faq_analysis["checkpoint_category"] == "faq_only":
+                category_consistent = not schema_faq_analysis["has_schema"] and schema_faq_analysis["has_faq"]
+            elif schema_faq_analysis["checkpoint_category"] == "neither":
+                category_consistent = not schema_faq_analysis["has_schema"] and not schema_faq_analysis["has_faq"]
             
-            # Check recommendation structure
-            required_fields = ["title", "description", "priority", "impact"]
-            valid_recommendations = all(all(field in rec for field in required_fields) for rec in recommendations)
+            # Check schema details if schema is detected
+            schema_details_valid = True
+            if schema_faq_analysis["has_schema"]:
+                schema_details = schema_faq_analysis.get("schema_details", {})
+                schema_details_valid = "json_ld_count" in schema_details and "microdata_count" in schema_details and "rdfa_count" in schema_details
             
-            passed = valid_recommendations
-            self.log_test_result("AI Insights Generation", passed, {
-                "recommendation_count": len(recommendations),
-                "sample_recommendation": recommendations[0] if recommendations else None,
-                "valid_structure": valid_recommendations
+            # Check FAQ details if FAQ is detected
+            faq_details_valid = True
+            if schema_faq_analysis["has_faq"]:
+                faq_details = schema_faq_analysis.get("faq_details", {})
+                faq_details_valid = "faq_indicators" in faq_details
+            
+            passed = (len(missing_fields) == 0 and category_valid and 
+                     category_consistent and schema_details_valid and faq_details_valid)
+            
+            self.log_test_result("Schema & FAQ Analysis", passed, {
+                "score": schema_faq_analysis["score"],
+                "has_schema": schema_faq_analysis["has_schema"],
+                "has_faq": schema_faq_analysis["has_faq"],
+                "checkpoint_category": schema_faq_analysis["checkpoint_category"],
+                "category_label": schema_faq_analysis["category_label"],
+                "category_valid": category_valid,
+                "category_consistent": category_consistent,
+                "schema_details_valid": schema_details_valid,
+                "faq_details_valid": faq_details_valid
             })
             
             return passed
         except Exception as e:
-            self.log_test_result("AI Insights Generation", False, str(e))
+            self.log_test_result("Schema & FAQ Analysis", False, str(e))
+            return False
+    
+    def test_pdf_export(self, session_id):
+        """Test PDF export functionality"""
+        try:
+            if not session_id:
+                self.log_test_result("PDF Export", False, "No session ID available")
+                return False
+            
+            # Request PDF export
+            response = self.session.get(f"{API_BASE_URL}/export/{session_id}?format=pdf", stream=True)
+            
+            if response.status_code != 200:
+                self.log_test_result("PDF Export", False, f"Status code: {response.status_code}, Response: {response.text}")
+                return False
+            
+            # Check content type
+            content_type = response.headers.get('Content-Type', '')
+            content_disposition = response.headers.get('Content-Disposition', '')
+            
+            is_pdf = content_type == 'application/pdf'
+            has_filename = 'filename=' in content_disposition
+            
+            # Check file size (should be non-zero)
+            content_length = int(response.headers.get('Content-Length', 0))
+            has_content = content_length > 0
+            
+            if not has_content:
+                # If Content-Length header is missing, check actual content
+                content = response.content
+                has_content = len(content) > 0
+            
+            passed = is_pdf and has_filename and has_content
+            
+            self.log_test_result("PDF Export", passed, {
+                "content_type": content_type,
+                "content_disposition": content_disposition,
+                "is_pdf": is_pdf,
+                "has_filename": has_filename,
+                "has_content": has_content
+            })
+            
+            return passed
+        except Exception as e:
+            self.log_test_result("PDF Export", False, str(e))
+            return False
+    
+    def test_pdf_export_error_handling(self):
+        """Test PDF export error handling with invalid session ID"""
+        try:
+            # Request PDF export with invalid session ID
+            response = self.session.get(f"{API_BASE_URL}/export/invalid-session-id?format=pdf")
+            
+            # Should return 404 for invalid session ID
+            invalid_session_handled = response.status_code == 404
+            
+            # Test with unsupported format
+            format_response = self.session.get(f"{API_BASE_URL}/export/some-session-id?format=invalid")
+            invalid_format_handled = format_response.status_code == 400
+            
+            passed = invalid_session_handled and invalid_format_handled
+            
+            self.log_test_result("PDF Export Error Handling", passed, {
+                "invalid_session_handled": invalid_session_handled,
+                "invalid_format_handled": invalid_format_handled
+            })
+            
+            return passed
+        except Exception as e:
+            self.log_test_result("PDF Export Error Handling", False, str(e))
             return False
     
     def run_all_tests(self):
