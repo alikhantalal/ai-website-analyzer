@@ -435,6 +435,192 @@ class WebsiteAnalyzer:
             'issues': issues
         }
     
+    def analyze_schema_and_faq(self, parsed_data: dict, html_content: str):
+        """Analyze schema markup and FAQ structure"""
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Schema analysis
+        schema_data = self.detect_schema_markup(soup)
+        
+        # FAQ analysis  
+        faq_data = self.detect_faq_structure(soup, parsed_data)
+        
+        # Determine checkpoint category
+        has_schema = schema_data['has_schema']
+        has_faq = faq_data['has_faq']
+        
+        if has_schema and has_faq:
+            checkpoint_category = "both_schema_faq"
+            category_label = "✅ Both Schema + FAQ"
+            score = 100
+        elif has_schema and not has_faq:
+            checkpoint_category = "schema_only"
+            category_label = "🔵 Schema Only (No FAQ)"
+            score = 75
+        elif not has_schema and has_faq:
+            checkpoint_category = "faq_only"
+            category_label = "🟡 FAQ Only (No Schema)"
+            score = 50
+        else:
+            checkpoint_category = "neither"
+            category_label = "❌ Neither Schema nor FAQ"
+            score = 25
+            
+        return {
+            'score': score,
+            'has_schema': has_schema,
+            'has_faq': has_faq,
+            'checkpoint_category': checkpoint_category,
+            'category_label': category_label,
+            'schema_details': schema_data,
+            'faq_details': faq_data,
+            'issues': schema_data['issues'] + faq_data['issues']
+        }
+    
+    def detect_schema_markup(self, soup):
+        """Detect various types of schema markup"""
+        issues = []
+        schema_types = []
+        has_schema = False
+        
+        # JSON-LD Detection
+        json_ld_scripts = soup.find_all('script', type='application/ld+json')
+        json_ld_schemas = []
+        
+        for script in json_ld_scripts:
+            try:
+                schema_data = json.loads(script.string)
+                if isinstance(schema_data, dict) and '@type' in schema_data:
+                    json_ld_schemas.append(schema_data['@type'])
+                    schema_types.append(f"JSON-LD: {schema_data['@type']}")
+                    has_schema = True
+                elif isinstance(schema_data, list):
+                    for item in schema_data:
+                        if isinstance(item, dict) and '@type' in item:
+                            json_ld_schemas.append(item['@type'])
+                            schema_types.append(f"JSON-LD: {item['@type']}")
+                            has_schema = True
+            except (json.JSONDecodeError, KeyError):
+                continue
+        
+        # Microdata Detection
+        microdata_elements = soup.find_all(attrs={'itemscope': True})
+        microdata_types = []
+        
+        for element in microdata_elements:
+            itemtype = element.get('itemtype')
+            if itemtype:
+                microdata_types.append(itemtype)
+                schema_types.append(f"Microdata: {itemtype}")
+                has_schema = True
+        
+        # RDFa Detection
+        rdfa_elements = soup.find_all(attrs={'typeof': True})
+        rdfa_types = []
+        
+        for element in rdfa_elements:
+            typeof = element.get('typeof')
+            if typeof:
+                rdfa_types.append(typeof)
+                schema_types.append(f"RDFa: {typeof}")
+                has_schema = True
+        
+        # Check for common schema types
+        if not has_schema:
+            issues.append("No structured data markup found")
+        else:
+            # Check for FAQ schema specifically
+            faq_schemas = [s for s in json_ld_schemas if 'FAQ' in s or 'Question' in s]
+            if not faq_schemas:
+                issues.append("No FAQ-specific schema markup found")
+        
+        return {
+            'has_schema': has_schema,
+            'json_ld_count': len(json_ld_scripts),
+            'microdata_count': len(microdata_elements),
+            'rdfa_count': len(rdfa_elements),
+            'schema_types': schema_types,
+            'json_ld_schemas': json_ld_schemas,
+            'microdata_types': microdata_types,
+            'rdfa_types': rdfa_types,
+            'issues': issues
+        }
+    
+    def detect_faq_structure(self, soup, parsed_data):
+        """Detect FAQ structure on the page"""
+        issues = []
+        has_faq = False
+        faq_indicators = []
+        
+        # Text-based FAQ detection
+        text_content = parsed_data.get('text_content', '').lower()
+        faq_patterns = [
+            r'frequently asked questions?',
+            r'f\.?a\.?q\.?s?',
+            r'common questions?',
+            r'questions? (?:and|&) answers?',
+            r'q\s*&\s*a',
+            r'help (?:and|&) support'
+        ]
+        
+        for pattern in faq_patterns:
+            if re.search(pattern, text_content):
+                has_faq = True
+                faq_indicators.append(f"Text pattern: {pattern}")
+        
+        # Heading-based FAQ detection
+        all_headings = []
+        for level in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+            all_headings.extend(parsed_data.get('headings', {}).get(level, []))
+        
+        faq_heading_patterns = [
+            r'faq',
+            r'frequently asked',
+            r'common questions',
+            r'questions?.*answers?',
+            r'help.*support'
+        ]
+        
+        for heading in all_headings:
+            heading_lower = heading.lower()
+            for pattern in faq_heading_patterns:
+                if re.search(pattern, heading_lower):
+                    has_faq = True
+                    faq_indicators.append(f"Heading: {heading}")
+                    break
+        
+        # Structure-based FAQ detection (Q&A pairs)
+        question_indicators = soup.find_all(text=re.compile(r'^\s*(?:Q\d*[:.]?|Question\d*[:.]?|\?)', re.IGNORECASE))
+        answer_indicators = soup.find_all(text=re.compile(r'^\s*(?:A\d*[:.]?|Answer\d*[:.]?)', re.IGNORECASE))
+        
+        if len(question_indicators) >= 2 and len(answer_indicators) >= 2:
+            has_faq = True
+            faq_indicators.append(f"Q&A structure: {len(question_indicators)} questions, {len(answer_indicators)} answers")
+        
+        # Check for FAQ-specific HTML structures
+        faq_containers = soup.find_all(attrs={'class': re.compile(r'faq|question|accordion', re.IGNORECASE)})
+        if len(faq_containers) >= 2:
+            has_faq = True
+            faq_indicators.append(f"FAQ containers: {len(faq_containers)} elements")
+        
+        # Schema-based FAQ detection
+        faq_schema_elements = soup.find_all(attrs={'itemtype': re.compile(r'FAQPage|Question', re.IGNORECASE)})
+        if faq_schema_elements:
+            has_faq = True
+            faq_indicators.append(f"Schema FAQ elements: {len(faq_schema_elements)}")
+        
+        if not has_faq:
+            issues.append("No FAQ structure detected")
+        
+        return {
+            'has_faq': has_faq,
+            'faq_indicators': faq_indicators,
+            'question_count': len(question_indicators),
+            'answer_count': len(answer_indicators),
+            'faq_containers': len(faq_containers),
+            'issues': issues
+        }
+    
     def calculate_scores(self, performance_data: dict, seo_data: dict, technical_data: dict, accessibility_data: dict):
         """Calculate overall and individual scores"""
         performance_score = performance_data['score']
