@@ -64,7 +64,7 @@ class WebsiteAnalyzerTester:
     def test_root_endpoint(self):
         """Test the root API endpoint"""
         try:
-            response = self.session.get(urljoin(API_BASE_URL, '/'))
+            response = self.session.get(f"{API_BASE_URL}")
             passed = response.status_code == 200 and "message" in response.json()
             self.log_test_result("Root API Endpoint", passed, response.json())
             return passed
